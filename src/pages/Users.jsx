@@ -1,10 +1,22 @@
-import { Table } from "reactstrap";
+import { Button, Table, Modal, ModalHeader, ModalBody, ModalFooter } from "reactstrap";
 import React from 'react';
 import { useEffect, useState } from "react";
 import axios from 'axios';
 import { Margin } from "@mui/icons-material";
-const Contacts = () => {
+import { Link, useNavigate } from "react-router-dom";
+import axiosRes from './../services/interceptor4008500';
+import example from '../components/Pagination';
+import TablePagination from "../components/Pagination";
+import BootstrapTable from 'react-bootstrap-table-next';
+import paginationFactory from 'react-bootstrap-table2-paginator';
+import Dropdown from 'react-bootstrap/Dropdown'
 
+
+
+
+const Contacts = (args) => {
+
+    <example />
     const initState = [];
     const [state, setState] = useState(initState);
     const [isEdit, setIsEdit] = useState(false);
@@ -13,33 +25,38 @@ const Contacts = () => {
     const [id, setId] = useState("");
     const [username, setUsername] = useState("");
     const [phone, setPhone] = useState("");
+
+    const navigate = useNavigate();
+
     useEffect(() => {
         const url = `https://jsonplaceholder.typicode.com`;
         axios
             .get(`${url}/users`)
-            .then((response) => setState(response.data));
+            .then(function (response) {
+                setState(response.data)
+            })
     }, []);
 
     const handleEdit = (event) => {
-
         setIsEdit(!isEdit);
         setId(event.id);
         setName(event.name);
         setEmail(event.email);
         setUsername(event.username);
         setPhone(event.phone);
+        navigate(`/layout/contacts/${event.id}`);
     };
 
-    const handleOnEditSubmit = (evt) => {
-        evt.preventDefault();
-        const url = `https://jsonplaceholder.typicode.com`;
 
+    const handleOnEditSubmit = (eventName, eventEmail, eventUsername, eventPhone) => {
+
+        const url = `https://jsonplaceholder.typicode.com`;
         axios
             .put(`${url}/users/${id}`, {
-                name: evt.target.name.value,
-                email: evt.target.email.value,
-                username: evt.target.username.value,
-                phone: evt.target.phone.value,
+                name: eventName,
+                email: eventEmail,
+                username: eventUsername,
+                phone: eventPhone,
             })
             .then((response) => {
                 setName(response.data.name);
@@ -53,7 +70,7 @@ const Contacts = () => {
     };
 
 
-    const handleDelte = (id) => {
+    const handleDelete = (id) => {
         setIsEdit(!isEdit);
 
         const url = `https://jsonplaceholder.typicode.com`;
@@ -69,67 +86,114 @@ const Contacts = () => {
         setIsEdit(isEdit);
     };
 
-    return (
-        <div>{isEdit ? (<div className='container mt-5 pt-5'>
-            <div className='row justify-content-center' dir="rtl">
-                <div className='col-6'>
-                    <form onSubmit={handleOnEditSubmit}>
-                        <div className="form-group">
-                            <label htmlFor="name">نام</label>
-                            <input type="text" name='name' value={name} onChange={(e) => setName(e.target.value)} className="form-control" id="name"></input>
-                        </div>
-                        <div className="form-group">
-                            <label htmlFor="username">نام کاربری</label>
-                            <input type="text" name='username' value={username} onChange={(e) => setUsername(e.target.value)} className="form-control" id="username"></input>
-                        </div>
-                        <div className="form-group">
-                            <label htmlFor="email">ایمیل</label>
-                            <input type="text" name='email' value={email} onChange={(e) => setEmail(e.target.value)} className="form-control" id="email"></input>
-                        </div>
-                        <div className="form-group">
-                            <label htmlFor="phone">شماره موبایل</label>
-                            <input type="text" name='phone' value={phone} onChange={(e) => setPhone(e.target.value)} className="form-control" id="phone"></input>
-                        </div>
-                        <button type="submit" className="btn btn-primary d-flex">ذخیره</button>
-                    </form>
-                </div>
-            </div>
-        </div>) : (<Table className="mt-5" dir="rtl" responsive>
-            <thead>
-                <tr>
-                    <th>
-                        نام
-                    </th>
-                    <th>
-                        نام کاربری
-                    </th>
-                    <th>
-                        ایمیل
-                    </th>
-                    <th>
-                        شماره موبایل
-                    </th>
-                    <th>
-                        عملیات
-                    </th>
-                </tr>
-            </thead>
-            <tbody>
-                {state.map((user) => (
-                    <tr key={user.id}>
-                        <td>{user.name}</td>
-                        <td>{user.username}</td>
-                        <td>{user.email}</td>
-                        <td>{user.phone}</td>
-                        <td>
-                            <button type="button" onClick={() => handleDelte(user.id)}>حذف</button>
-                            <button type="submit" onClick={() => handleEdit(user)}>ویرایش</button>
-                        </td>
-                    </tr>
-                ))}
-            </tbody>
-        </Table>)}</div>
+    const [modalEdit, setModalEdit] = useState(false);
+    const [modalDelete, setModalDelete] = useState(false);
 
-    )
+    const toggleDelete = () => setModalDelete(!modalDelete);
+    const toggleEdit = () => setModalEdit(!modalEdit);
+    // set Table column names
+    const columns = [{
+        dataField: 'name',
+        text: 'نام'
+    }, {
+        dataField: 'username',
+        text: ' نام کاربری'
+    }, {
+        dataField: 'email',
+        text: ' ایمیل'
+    }, {
+        dataField: 'phone',
+        text: ' شماره موبایل'
+    },
+    {
+        dataField: "action",
+        text: "عملیات",
+        sort: false,
+        formatter: rankFormatter,
+        headerAttrs: { width: 50 },
+        attrs: { width: 50, class: "EditRow" }
+    },];
+
+    const editbutton = (row) => {
+        return (
+            <Button type="submit" color="success" onClick={() => handleEdit(row)}>ویرایش</Button>
+
+        );
+    }
+
+    const deletebutton = (id) => {
+        return (
+            <Button type="button" color="danger" onClick={toggleDelete} >حذف</Button>
+
+
+        );
+    }
+
+
+    function rankFormatter(cell, row, rowIndex, formatExtraData) {
+        return (
+            < div
+                style={{
+                    textAlign: "center",
+                    cursor: "pointer",
+                    lineHeight: "normal",
+                    display: "flex"
+                }}>
+
+                <editbutton row={row} />
+                <deletebutton id={row.id} />
+
+            </div>
+        );
+    }
+
+
+
+    const sizePerPageRenderer = ({
+        currSizePerPage,
+        onSizePerPageChange
+    }) => (
+
+        <Dropdown className="d-inline">
+            <Dropdown.Toggle variant="primary" id="dropdown-basic">
+                {currSizePerPage}
+            </Dropdown.Toggle>
+            <Dropdown.Menu>
+                <Dropdown.Item
+                    key={'5'}
+                    onClick={() => onSizePerPageChange(5)}
+                    className={`btn ${currSizePerPage === `${5}` ? 'btn-secondary' : 'btn-warning'}`}
+                    href="javascript:void(0)"> {5}</Dropdown.Item>
+                <Dropdown.Item
+                    key={'10'}
+                    onClick={() => onSizePerPageChange(10)}
+                    className={`btn ${currSizePerPage === `${10}` ? 'btn-secondary' : 'btn-warning'}`}
+                    href="javascript:void(0)"> {10}</Dropdown.Item>
+            </Dropdown.Menu>
+        </Dropdown>
+    );
+    const options = {
+        sizePerPageRenderer,
+        showTotal: false,
+    };
+    
+    return (
+       
+                    <div>
+                        <h2>TablePagination Demo</h2>
+                        {/* Render table */}
+                        <BootstrapTable
+                            classes="small table-sm"
+                            bootstrap4
+                            keyField='id'
+                            data={state}
+                            columns={columns}
+                            pagination={paginationFactory(options)}
+                            bordered={true}
+                            tabIndexCell
+                        />
+                    </div>
+               
+    );
 }
 export default Contacts;

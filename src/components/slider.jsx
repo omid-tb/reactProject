@@ -2,20 +2,21 @@ import React from 'react';
 import { UncontrolledCarousel } from 'reactstrap';
 
 const items = [
+
     {
-        src: require('./../image/image1.jpeg'),
+        src: require('./../assets/image1.jpeg'),
         altText: 'Slide 1',
       },
       {
-        src: require('./../image/image2.jpeg'),        
+        src: require('./../assets/image2.jpeg'),        
         altText: 'Slide 2',
       },
       {
-        src: require('./../image/image3.jpeg'),        
+        src: require('./../assets/image3.jpeg'),        
         altText: 'Slide 3',
       },
       {
-        src: require('./../image/image4.jpeg'),        
+        src: require('./../assets/image4.jpeg'),        
         altText: 'Slide 4',
       }
     

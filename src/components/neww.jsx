@@ -5,7 +5,14 @@ import "../css.folder/neww.css"
 import { Link } from "react-router-dom"
 import { Layout } from "../pages"
 
+
+
+
+
 const Neww = () => {
+  
+ 
+
   const handleSubmit = (event) => {
     
     event.preventDefault();
@@ -37,7 +44,9 @@ const Neww = () => {
     typeMismatch: false,
     errMsg: " this is where our error message gets across"
 };
+
   return (
+    
     <div className="Auth-form-container" dir="rtl">
       <form className="Auth-form">
         <div className="Auth-form-content">
@@ -75,6 +84,6 @@ const Neww = () => {
         </div>
       </form>
     </div>
-  )
+   )
 }
 export default Neww;

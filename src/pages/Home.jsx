@@ -5,17 +5,20 @@ import Neww from '../components/neww';
 
 import Example from '../components/Navbar';
 import Navv from '../components/nav';
-import Slider  from '../components/slider';
+import Slider from '../components/slider';
+
 
 const Home = () => {
+  
   return (
+   
+          <>
 
-        <>
-          
-    <Slider/>
-          <Outlet />
-        </>
-      )
+            <Slider />
+            <Outlet />
+          </>
+        
+  )
 }
 
 export default Home;

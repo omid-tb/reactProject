@@ -16,10 +16,11 @@ import {
 
 function Example(args) {
   const [isOpen, setIsOpen] = useState(false);
-
+  
   const toggle = () => setIsOpen(!isOpen);
 
   return (
+   
     <div>
       <Navbar {...args}>
         <NavbarBrand >reactstrap</NavbarBrand>
@@ -44,7 +45,7 @@ function Example(args) {
         </Collapse>
       </Navbar>
     </div>
-  );
+    );
 }
 
 export default Example;
